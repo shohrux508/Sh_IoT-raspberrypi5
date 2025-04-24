@@ -1,22 +1,22 @@
 import asyncio
 import websockets
-import json
 
 async def websocket_client():
-    uri = "wss://shiot-production.up.railway.app/devices/3"
+    uri = "wss://shiot-production.up.railway.app/devices/register/3"
     async with websockets.connect(uri) as websocket:
+        print("Connected to server.")
         while True:
-            await websocket.send(json.dumps({"token":"2645"}))
             try:
                 msg = await websocket.recv()
+                print(f"Received: {msg}")
+                if msg == 'ping':
+                    await websocket.send('pong')
+                    print("Sent: pong")
             except websockets.ConnectionClosed:
-                print("WebSocket закрыт, выходим из цикла")
+                print("Connection closed by server.")
                 break
-            if msg == 'ping':
-                await websocket.send('pong')
             await asyncio.sleep(0.01)
 
 if __name__ == "__main__":
     print("Client started…")
     asyncio.run(websocket_client())
-
