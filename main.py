@@ -13,15 +13,25 @@ class manageArduino:
         self.pins_in_num = {int(key.replace('pin', '')): f"{key}" for key, value in pins.items()}
 
     def get_pin(self, pin: int):
-        return self.pins_in_num.get(pin)
+        pin_name = self.pins_in_num.get(pin)
+        if pin_name is None:
+            raise ValueError(f'Пин {pin} не найден.')
+        return pin_name
 
     def get_status(self, pin: int):
-        return self.pins_status[self.get_pin(pin)]
+        pin_status = self.pins_status[self.get_pin(pin)]
+        if pin_status is None:
+            raise ValueError(f'Пин {pin} не найден.')
+        return pin_status
 
     def toggle(self, pin: int = None):
-        self.pins_status[self.get_pin(pin)] = int(not self.get_status(pin))
-        print(self.pins_status)
-        return self.get_status(pin)
+        if pin is None:
+            for key, value in self.pins_status:
+                self.pins_status[key] = int(not value)
+        else:
+            self.pins_status[self.get_pin(pin)] = int(not self.get_status(pin))
+            print(self.pins_status)
+            return self.get_status(pin)
 
     def set_pin(self, pin: int, status: int):
         self.pins_status[self.get_pin(pin)] = status
