@@ -40,20 +40,17 @@ async def websocket_client():
         while True:
             try:
                 msg = await websocket.recv()
-                # print(f"Received: {msg}")
                 if msg == 'ping':
                     await websocket.send('pong')
-                    # print("Sent: pong")
-                if msg.startswith('set_pin:'):
-                    # set_pin:5-1
-                    pin, status = (filter_data('set_pin:')).split('-')
-                    arduino.set_pin(pin, status)
-                if msg.startswith('toggle_pin:'):
-                    pin = int(filter_data(msg, 'toggle_pin:'))
-                    arduino.toggle(pin=pin)
-
-
-
+                else:
+                    print(f"Получено: {msg}")
+                    if msg.startswith('set_pin:'):
+                        # set_pin:5-1
+                        pin, status = (filter_data('set_pin:')).split('-')
+                        arduino.set_pin(pin, status)
+                    if msg.startswith('toggle_pin:'):
+                        pin = int(filter_data(msg, 'toggle_pin:'))
+                        arduino.toggle(pin=pin)
 
             except websockets.ConnectionClosed:
                 print("Connection closed by server.")
