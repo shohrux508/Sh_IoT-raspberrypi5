@@ -9,33 +9,38 @@ from helpers import filter_data
 class manageArduino:
     def __init__(self, **pins):
         self.pins = pins
-        self.pins_status = {f"{key}": 0 for key, value in pins.items()}
-        self.pins_in_num = {int(key.replace('pin', '')): f"{key}" for key, value in pins.items()}
+        self.pins_status = {key: 0 for key, value in pins.items()}
+        self.pins_in_num = {int(key.replace('pin', '')): key for key, value in pins.items()}
 
     def get_pin(self, pin: int):
         pin_name = self.pins_in_num.get(pin)
         if pin_name is None:
-            raise ValueError(f'Пин {pin} не найден.')
+            print(f"[Предупреждение] Пин {pin} не найден.")
+            return None
         return pin_name
 
     def get_status(self, pin: int):
-        pin_status = self.pins_status[self.get_pin(pin)]
-        if pin_status is None:
-            raise ValueError(f'Пин {pin} не найден.')
-        return pin_status
+        key = self.get_pin(pin)
+        if key is None:
+            return None
+        return self.pins_status.get(key)
 
     def toggle(self, pin: int = None):
         if pin is None:
-            for key, value in self.pins_status:
+            for key, value in self.pins_status.items():
                 self.pins_status[key] = int(not value)
         else:
-            self.pins_status[self.get_pin(pin)] = int(not self.get_status(pin))
-            print(self.pins_status)
-            return self.get_status(pin)
+            key = self.get_pin(pin)
+            if key is not None:
+                self.pins_status[key] = int(not self.pins_status[key])
+        return self.get_status(pin) if pin else None
 
-    def set_pin(self, pin: int, status: int):
-        self.pins_status[self.get_pin(pin)] = status
-        return status
+    def set_pin(self, pin: int, status: bool):
+        key = self.get_pin(pin)
+        if key is not None:
+            self.pins_status[key] = int(status)
+        return self.get_status(pin)
+
 
 
 arduino = manageArduino(pin2='led1', pin3='led2', pin4='led3')
