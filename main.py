@@ -3,7 +3,7 @@ import asyncio
 import websockets
 from pyee.asyncio import AsyncIOEventEmitter
 from dotenv import load_dotenv
-from device import device_state
+from managers import device_state as device
 
 import os
 
@@ -65,11 +65,12 @@ async def handle_message(msg, ws):
     except:
         print(f"Not JSON: {msg}")
         return
+    print(f'Message from server: {data}')
     action = data.get('action')
-    pin = data.get('pin')
+    pin = int(data.get('pin'))
     request_id = data.get('request_id', None)
-    device = device_state
-
+    await device.set_ws(websocket=ws)
+    print(device.ws)
     # Ответ по умолчанию
     response = {
         'action': action,
@@ -79,18 +80,18 @@ async def handle_message(msg, ws):
 
     if action == 'set_state':
         state = data.get('state')
-        device.set_state(pin=pin, state=state)
+        await device.set_state(pin=pin, state=int(state))
         print(f"[{now()}] ⚙️ GPIO {pin} set to {state}")
 
     elif action == 'set_mode':
         mode = data.get('mode')
-        device.set_mode(pin=pin, mode=mode)
+        await device.set_mode(pin=pin, mode=mode)
         print(f"[{now()}] 🔁 Mode set for GPIO {pin}: {mode}")
 
     elif action == 'set_schedule':
         on = data.get('on_time')
         off = data.get('off_time')
-        device.set_schedule(pin=pin, on_time=on, off_time=off)
+        await device.set_schedule(pin=pin, on_time=on, off_time=off)
         print(f"[{now()}] ⏱ Schedule set for GPIO {pin}: {schedule[pin]}")
 
     else:

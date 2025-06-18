@@ -6,14 +6,6 @@ class SetState(BaseModel):
     pin: int
     state: int
 
-    @model_validator(mode="before")
-    def convert_state(cls, data):
-        # data — dict с исходными данными
-        state = data.get('state')
-        if isinstance(state, int):
-            data['state'] = 'turn_on' if state == 1 else 'turn_off'
-        return data
-
 
 class SetMode(BaseModel):
     action: str = 'set_mode'

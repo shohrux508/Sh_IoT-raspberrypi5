@@ -1,7 +1,7 @@
+import json
 from typing import Literal, Dict, cast
 
 from schemas import SetState, SetSchedule, SetMode
-
 
 PinMode = Literal["manual", "auto"]
 PinState = Literal[1, 0]
@@ -23,34 +23,37 @@ class DeviceStateManager:
     async def set_ws(self, websocket):
         self.ws = websocket
 
+    async def report_to(self, data):
+        pass
+
     async def set_mode(self, pin: int, mode: PinMode):
         self.pin_modes[pin] = mode
         data = SetMode(pin=pin, mode=mode).model_dump()
-        await self.ws.send_json(data=data)
+        await self.report_to(data)
 
     async def set_state(self, pin: int, state: PinState):
         self.pin_status[pin] = state
         data = SetState(pin=pin, state=state).model_dump()
-        await self.ws.send_json(data=data)
+        await self.report_to(data)
 
     async def set_schedule(self, pin: int, on_time: str, off_time: str):
         self.pin_schedule[pin] = {"on": on_time, "off": off_time}
         data = SetSchedule(pin=pin, on_time=on_time, off_time=off_time).model_dump()
-        await self.ws.send_json(data=data)
+        await self.report_to(data)
 
     async def get_mode(self, pin: int):
         pin_mode = self.pin_modes.get(pin, "manual")
-        await self.ws.send_json(data={'pin': pin, 'mode': pin_mode})
+        data = {'pin': pin, 'mode': pin_mode}
+        await self.report_to(data)
 
     async def get_status(self, pin: int):
         pin_state = self.pin_status.get(pin, 0)
-        await self.ws.send_json(data={'pin': pin, 'state': pin_state})
+        data = {'pin': pin, 'state': pin_state}
+        await self.report_to(data)
 
     async def get_schedule(self, pin: int):
         pin_schedule = self.pin_schedule.get(pin, {})
         on = pin_schedule.get('on_time')
         off = pin_schedule.get('off_time')
-        await self.ws.send_json(data={'pin': pin, 'on_time': on, 'off_time': off})
-
-
-device_state = DeviceStateManager()
+        data = {'pin': pin, 'on_time': on, 'off_time': off}
+        await self.report_to(data)
