@@ -19,6 +19,9 @@ class DeviceStateManager:
         for pin, cfg in pins_config.items():
             self.pin_modes[pin] = cast(PinMode, cfg["mode"])
             self.pin_status[pin] = cast(PinState, cfg["state"])
+        for pin in const_pins:
+            self.pin_schedule[pin] = {'on_time': '12:00', 'off_time': '13:00'}
+        print(self.pin_schedule)
 
     async def set_ws(self, websocket):
         self.ws = websocket
@@ -38,7 +41,8 @@ class DeviceStateManager:
                     'schedule': self.pin_schedule.get(pin)}
             report_data.append(data)
         payload = {'type': 'report', 'pin_list': report_data}
-        self.ws.send(payload)
+        print(payload)
+        await self.ws.send(json.dumps(payload))
 
     async def set_mode(self, pin: int, mode: PinMode):
         self.pin_modes[pin] = mode
@@ -49,8 +53,9 @@ class DeviceStateManager:
         await self.report_to(pin)
 
     async def set_schedule(self, pin: int, on_time: str, off_time: str):
-        self.pin_schedule[pin] = {"on": on_time, "off": off_time}
+        self.pin_schedule[pin] = {"on_time": on_time, "off_time": off_time}
         await self.report_to(pin)
 
     async def get_report(self, pin: int = None):
         await self.report_to(pin)
+
