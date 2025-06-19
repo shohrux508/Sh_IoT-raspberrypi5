@@ -71,12 +71,6 @@ async def handle_message(msg, ws):
     request_id = data.get('request_id', None)
     await device.set_ws(websocket=ws)
     print(device.ws)
-    # Ответ по умолчанию
-    response = {
-        'action': action,
-        'result': 'ok',
-        'request_id': request_id
-    }
 
     if action == 'set_state':
         state = data.get('state')
@@ -93,13 +87,6 @@ async def handle_message(msg, ws):
         off = data.get('off_time')
         await device.set_schedule(pin=pin, on_time=on, off_time=off)
         print(f"[{now()}] ⏱ Schedule set for GPIO {pin}: {schedule[pin]}")
-
-    else:
-        response['result'] = 'error'
-        print(f"[{now()}] ❓ Unknown action: {action}")
-
-    await ws.send(json.dumps(response))
-    print(f"[{now()}] ✅ Responded to {action} (request_id: {request_id})")
 
 
 # ------------------------------
