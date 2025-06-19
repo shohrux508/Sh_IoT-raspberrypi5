@@ -67,7 +67,12 @@ async def handle_message(msg, ws):
         return
     print(f'Message from server: {data}')
     action = data.get('action')
-    pin = int(data.get('pin'))
+    pin = data.get('pin')
+    try:
+        pin = int(pin)
+    except:
+        pass
+
     await device.set_ws(websocket=ws)
 
     if action == 'set_state':
@@ -85,6 +90,8 @@ async def handle_message(msg, ws):
         off = data.get('off_time')
         await device.set_schedule(pin=pin, on_time=on, off_time=off)
         print(f"[{now()}] ⏱ Schedule set for GPIO {pin}: {schedule[pin]}")
+    elif action == 'report':
+        await device.report_to(pin)
 
 
 # ------------------------------
