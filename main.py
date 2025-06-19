@@ -68,9 +68,7 @@ async def handle_message(msg, ws):
     print(f'Message from server: {data}')
     action = data.get('action')
     pin = int(data.get('pin'))
-    request_id = data.get('request_id', None)
     await device.set_ws(websocket=ws)
-    print(device.ws)
 
     if action == 'set_state':
         state = data.get('state')
