@@ -85,6 +85,8 @@ async def handle_message(msg, ws):
         off = data.get('off_time')
         await device.set_schedule(pin=pin, on_time=on, off_time=off)
         print(f"[{now()}] ⏱ Schedule set for GPIO {pin}: {schedule[pin]}")
+    elif action == 'report':
+        await device.report_to()
 
 
 # ------------------------------

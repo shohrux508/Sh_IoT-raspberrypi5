@@ -26,7 +26,7 @@ class DeviceStateManager:
     async def set_ws(self, websocket):
         self.ws = websocket
 
-    async def report_to(self, pin: int):
+    async def report_to(self, pin: int = None):
         if not pin:
             pin_list = []
             for pin in const_pins:
@@ -55,7 +55,3 @@ class DeviceStateManager:
     async def set_schedule(self, pin: int, on_time: str, off_time: str):
         self.pin_schedule[pin] = {"on_time": on_time, "off_time": off_time}
         await self.report_to(pin)
-
-    async def get_report(self, pin: int = None):
-        await self.report_to(pin)
-
